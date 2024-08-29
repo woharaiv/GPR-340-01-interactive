@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <memory>
+#include <SDL.h>
 #include "math/Vector2.h"
 #include "math/Vector3.h"
 #include "math/ColorT.h"

@@ -28,11 +28,13 @@ Boid::Boid(Engine* pEngine, World* pWorld) : Particle(pEngine), world(pWorld) {}
 void Boid::Update(float deltaTime) {
   Particle::Update(deltaTime);
   std::vector<Boid*> neighborhood = computeBoidNeighborhood();
-
-  for (auto& rule : rules) {
-    auto weightedForce = rule->computeWeightedForce(neighborhood, this);
-    // std::cout << typeid(*rule).name() << " Force : " << Vector2f::getMagnitude(weightedForce) << std::endl;
-    applyForce(weightedForce);
+  if(!neighborhood.empty())
+  {
+    for (auto& rule : rules) {
+      auto weightedForce = rule->computeWeightedForce(neighborhood, this);
+      // std::cout << typeid(*rule).name() << " Force : " << Vector2f::getMagnitude(weightedForce) << std::endl;
+      applyForce(weightedForce);
+    }
   }
 }
 
