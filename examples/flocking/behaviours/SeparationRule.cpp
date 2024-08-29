@@ -7,13 +7,11 @@ Vector2f SeparationRule::computeForce(const std::vector<Boid*>& neighborhood, Bo
   // Try to avoid boids too close
   Vector2f separatingForce = Vector2f::zero();
 
-
-
   int boidsInRadius = 0;
   for (int i = 0; i < neighborhood.size(); i++)
   {
     //Calculate the target boid's distance to this one
-    Vector2f vecToBoid = neighborhood[i]->getPosition() - boid->getPosition();
+    Vector2f vecToBoid = boid->getPosition() - neighborhood[i]->getPosition();
 
     //If the distance is 0, it'll cause errors in the math later, so don't calculate this boid.
     if(vecToBoid.x == 0 && vecToBoid.y == 0)
