@@ -28,13 +28,37 @@ Boid::Boid(Engine* pEngine, World* pWorld) : Particle(pEngine), world(pWorld) {}
 void Boid::Update(float deltaTime) {
   Particle::Update(deltaTime);
   std::vector<Boid*> neighborhood = computeBoidNeighborhood();
-  if(!neighborhood.empty())
+  if(!controledByUser)
   {
-    for (auto& rule : rules) {
-      auto weightedForce = rule->computeWeightedForce(neighborhood, this);
-      // std::cout << typeid(*rule).name() << " Force : " << Vector2f::getMagnitude(weightedForce) << std::endl;
-      applyForce(weightedForce);
+    if(!neighborhood.empty())
+    {
+      for (auto& rule : rules) {
+        auto weightedForce = rule->computeWeightedForce(neighborhood, this);
+        // std::cout << typeid(*rule).name() << " Force : " << Vector2f::getMagnitude(weightedForce) << std::endl;
+        applyForce(weightedForce);
+      }
     }
+    else //If the neighborhood is empty,
+    {
+      for(int i = 3; i < rules.size(); i++)
+      {
+        auto weightedForce = rules[i]->computeWeightedForce(neighborhood, this);
+        applyForce(weightedForce);
+      }
+    }
+  }
+  else
+  {
+    Vector2f controlForce = {0, 0};
+    if(ImGui::IsKeyDown(ImGuiKey_W))
+      controlForce.y -= 1.;
+    if(ImGui::IsKeyDown(ImGuiKey_A))
+      controlForce.x -= 1.;
+    if(ImGui::IsKeyDown(ImGuiKey_S))
+      controlForce.y += 1.;
+    if(ImGui::IsKeyDown(ImGuiKey_D))
+      controlForce.x += 1.;
+    applyForce(controlForce * controlledSpeed);
   }
 }
 

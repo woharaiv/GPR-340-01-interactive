@@ -35,11 +35,11 @@ Vector2f SeparationRule::computeForce(const std::vector<Boid*>& neighborhood, Bo
 
 bool SeparationRule::drawImguiRuleExtra() {
   ImGui::SetCurrentContext(world->engine->window->imGuiContext);
-  bool valusHasChanged = false;
+  bool valueHasChanged = false;
 
   if (ImGui::DragFloat("Desired Separation", &desiredMinimalDistance, 0.05f)) {
-    valusHasChanged = true;
+    valueHasChanged = true;
   }
 
-  return valusHasChanged;
+  return valueHasChanged;
 }

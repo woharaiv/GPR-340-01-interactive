@@ -3,6 +3,8 @@
 
 Vector2f CohesionRule::computeForce(const std::vector<Boid*>& neighborhood, Boid* boid)
 {
+  if(neighborhood.size() <= 0)
+    return Vector2f::zero();
   Vector2f cohesionForce = Vector2f::zero();
   Vector2f centerOfMass = Vector2f::zero();
 

@@ -50,8 +50,21 @@ void World::setNumberOfBoids(int number) {
 
   if (diff == 0) return;
 
+  //If there's a user boid, pop it here and push it to the new end afterward, so it's always at the back of the list.
+  bool userBoidExists = (userBoid != nullptr);
+  Vector2f userBoidPos = {0, 0};
+  Vector2f userBoidVel = {0, 0};
+  Color32 userBoidColor;
+  if(userBoidExists)
+  {
+    userBoidPos = userBoid->getPosition();
+    userBoidVel = userBoid->getVelocity();
+    userBoidColor = userBoid->color;
+    destroyUserBoid();
+  }
+
   // Need to add boids
-  else if (diff < 0) {
+  if (diff < 0) {
     // Back to positive
     diff = -diff;
 
@@ -67,6 +80,14 @@ void World::setNumberOfBoids(int number) {
       engine->Destroy(go);
       boids.pop_back();
     }
+  if(userBoidExists)
+  {
+    userBoid = createUserBoid();
+    userBoid->color = userBoidColor;
+    userBoid->setPosition(userBoidPos);
+    userBoid->setVelocity(userBoidVel);
+  }
+
 }
 
 void World::randomizeBoidPositionAndVelocity(Boid* boid) {
@@ -111,6 +132,23 @@ Boid* World::createBoid() {
   return boid;
 }
 
+Boid* World::createUserBoid() {
+  userBoid = createBoid();
+  userBoid->controledByUser = true;
+  userBoid->setPosition({engine->window->size().x/2, engine->window->size().y/2});
+  boids.push_back(userBoid);
+}
+
+void World::destroyUserBoid() {
+  if (userBoid != nullptr)
+  {
+    engine->Destroy(userBoid);
+    userBoid = nullptr;
+    boids.pop_back();
+  }
+}
+
+
 std::vector<Boid*>* World::getAllBoids() { return &boids; }
 
 void World::drawGeneralUI() {
@@ -126,6 +164,16 @@ void World::drawGeneralUI() {
 
     if (ImGui::SliderFloat("Neighborhood Radius", &detectionRadius, 0.0f, 250.0f, "%.f"))
       for (const auto& boid : boids) boid->setDetectionRadius(detectionRadius);
+    bool _; //ImGUI gets mad if you try to pass it a nullptr
+    if (ImGui::Checkbox("Create Boid Controlled By User", &_))
+    {
+      if (userBoid == nullptr)
+        userBoid = createUserBoid();
+      ImGui::DragFloat("Speed", &userBoid->controlledSpeed);
+    }
+    else
+      if(userBoid != nullptr)
+        destroyUserBoid();
 
     // Speeds
     ImGui::SetNextItemOpen(false, ImGuiCond_Once);

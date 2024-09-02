@@ -23,6 +23,8 @@ private:
 
   float detectionRadius = 35;
 
+  Boid* userBoid = nullptr;
+
   // Display
   bool showRadius = false;
   bool showRules = false;
@@ -44,6 +46,8 @@ private:
   void warpParticleIfOutOfBounds(Particle* particle);
 
   Boid* createBoid();
+  Boid* createUserBoid();
+  void destroyUserBoid();
 
 public:
   // cached list to manipulate objects
