@@ -24,6 +24,8 @@ private:
   float detectionRadius = 35;
 
   Boid* userBoid = nullptr;
+  bool usingUserBoid = false;
+  float userSpeed = 1.0f;
 
   // Display
   bool showRadius = false;

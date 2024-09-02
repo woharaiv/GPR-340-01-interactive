@@ -39,7 +39,8 @@ public:
 
   void setVelocity(Vector2f velocity_) {
     velocity = velocity_;
-    transform.rotation = velocity_.normalized();
+    if(!(velocity.x == 0 && velocity.y == 0))
+      transform.rotation = velocity_.normalized();
   }
 
   void setSpeed(float newSpeed) { speed = newSpeed; }

@@ -49,7 +49,8 @@ void Boid::Update(float deltaTime) {
   }
   else
   {
-    Vector2f controlForce = {0, 0};
+    Vector2f controlForce = Vector2f::zero();
+    velocity = Vector2f::zero();
     if(ImGui::IsKeyDown(ImGuiKey_W))
       controlForce.y -= 1.;
     if(ImGui::IsKeyDown(ImGuiKey_A))
@@ -58,7 +59,7 @@ void Boid::Update(float deltaTime) {
       controlForce.y += 1.;
     if(ImGui::IsKeyDown(ImGuiKey_D))
       controlForce.x += 1.;
-    applyForce(controlForce * controlledSpeed);
+    velocity = controlForce * controlledSpeed;
   }
 }
 

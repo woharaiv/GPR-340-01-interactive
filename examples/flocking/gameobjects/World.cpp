@@ -52,14 +52,19 @@ void World::setNumberOfBoids(int number) {
 
   //If there's a user boid, pop it here and push it to the new end afterward, so it's always at the back of the list.
   bool userBoidExists = (userBoid != nullptr);
-  Vector2f userBoidPos = {0, 0};
-  Vector2f userBoidVel = {0, 0};
+  float userBoidControlledSpeed = 0.;
+
+  Vector2f userBoidPos = Vector2f::zero();
+  Vector2f userBoidVel = Vector2f::zero();
+  Vector2f userBoidRotation = Vector2f::zero();
   Color32 userBoidColor;
   if(userBoidExists)
   {
+    userBoidControlledSpeed = userBoid->controlledSpeed;
     userBoidPos = userBoid->getPosition();
     userBoidVel = userBoid->getVelocity();
     userBoidColor = userBoid->color;
+    userBoidRotation = userBoid->transform.rotation;
     destroyUserBoid();
   }
 
@@ -80,12 +85,15 @@ void World::setNumberOfBoids(int number) {
       engine->Destroy(go);
       boids.pop_back();
     }
+  //Put the user boid back to the end of the list
   if(userBoidExists)
   {
     userBoid = createUserBoid();
     userBoid->color = userBoidColor;
     userBoid->setPosition(userBoidPos);
     userBoid->setVelocity(userBoidVel);
+    userBoid->transform.rotation = userBoidRotation;
+    userBoid->controlledSpeed = userBoidControlledSpeed;
   }
 
 }
@@ -136,7 +144,10 @@ Boid* World::createUserBoid() {
   userBoid = createBoid();
   userBoid->controledByUser = true;
   userBoid->setPosition({engine->window->size().x/2, engine->window->size().y/2});
+  userBoid->transform.scale = {3, 3};
+  userBoid->setHasConstantSpeed(true);
   boids.push_back(userBoid);
+  return userBoid;
 }
 
 void World::destroyUserBoid() {
@@ -154,7 +165,7 @@ std::vector<Boid*>* World::getAllBoids() { return &boids; }
 void World::drawGeneralUI() {
   ImGui::SetNextItemOpen(true, ImGuiCond_Once);  // Next header is opened by default
   if (ImGui::CollapsingHeader("General")) {
-    if (ImGui::DragInt("Number of Boids", &nbBoids)) {
+    if (ImGui::DragInt("Number of Boids", &nbBoids, 1, 0)) {
       if (nbBoids < 0) nbBoids = 0;
       setNumberOfBoids(nbBoids);
     }
@@ -164,16 +175,18 @@ void World::drawGeneralUI() {
 
     if (ImGui::SliderFloat("Neighborhood Radius", &detectionRadius, 0.0f, 250.0f, "%.f"))
       for (const auto& boid : boids) boid->setDetectionRadius(detectionRadius);
-    bool _; //ImGUI gets mad if you try to pass it a nullptr
-    if (ImGui::Checkbox("Create Boid Controlled By User", &_))
+    if (ImGui::Checkbox("Create Boid Controlled By User", &usingUserBoid))
     {
       if (userBoid == nullptr)
         userBoid = createUserBoid();
-      ImGui::DragFloat("Speed", &userBoid->controlledSpeed);
-    }
-    else
-      if(userBoid != nullptr)
+      else
         destroyUserBoid();
+    }
+    if(usingUserBoid && userBoid != nullptr) {
+      if (ImGui::DragFloat("Movement Speed", &(userBoid->controlledSpeed), 1., 0.0f)) {
+        userBoid->setSpeed(userBoid->controlledSpeed);
+      }
+    }
 
     // Speeds
     ImGui::SetNextItemOpen(false, ImGuiCond_Once);
@@ -218,7 +231,11 @@ void World::drawGeneralUI() {
     }
 
     if (ImGui::Button("Randomize Boids position and velocity"))
-      for (const auto& boid : boids) randomizeBoidPositionAndVelocity(boid);
+      for (const auto& boid : boids)
+      {
+        if(!boid->controledByUser)
+          randomizeBoidPositionAndVelocity(boid);
+      }
   }
 }
 
