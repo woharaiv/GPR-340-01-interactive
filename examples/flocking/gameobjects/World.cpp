@@ -21,11 +21,11 @@ World::World(Engine* pEngine) : GameObject(pEngine) {}
 void World::initializeRules() {
   // Starting Rules
   // parameters: desired separation, weight
-  boidsRules.emplace_back(std::make_unique<SeparationRule>(this, 25.f, 4.75f));
+  boidsRules.emplace_back(std::make_unique<SeparationRule>(this, 25.f, 4.75f, 2.f));
   // parameters: weight
-  boidsRules.emplace_back(std::make_unique<CohesionRule>(this, 4.25f));
+  boidsRules.emplace_back(std::make_unique<CohesionRule>(this, 4.25f, 2.f));
   // parameters: weight
-  boidsRules.emplace_back(std::make_unique<AlignmentRule>(this, 2.9f));
+  boidsRules.emplace_back(std::make_unique<AlignmentRule>(this, 2.9f, 2.f));
   // parameters: weight
   boidsRules.emplace_back(std::make_unique<MouseInfluenceRule>(this, 2.f));
   // parameters: distance from frame border, weight
@@ -35,7 +35,11 @@ void World::initializeRules() {
 
   // Starting weights are saved as defaults
   defaultWeights.clear();
-  for (const auto& rule : boidsRules) defaultWeights.push_back(rule->weight);
+  defaultBonusWeights.clear();
+  for (const auto& rule : boidsRules) {
+    defaultWeights.push_back(rule->weight);
+    defaultBonusWeights.push_back(rule->userBoidBonusWeight);
+  }
 
   ImGui::SetCurrentContext(engine->window->imGuiContext);
   SetupImGuiStyle();
@@ -165,7 +169,7 @@ std::vector<Boid*>* World::getAllBoids() { return &boids; }
 void World::drawGeneralUI() {
   ImGui::SetNextItemOpen(true, ImGuiCond_Once);  // Next header is opened by default
   if (ImGui::CollapsingHeader("General")) {
-    if (ImGui::DragInt("Number of Boids", &nbBoids, 1, 0)) {
+    if (ImGui::DragInt("Number of Boids", &nbBoids)) {
       if (nbBoids < 0) nbBoids = 0;
       setNumberOfBoids(nbBoids);
     }
@@ -175,14 +179,14 @@ void World::drawGeneralUI() {
 
     if (ImGui::SliderFloat("Neighborhood Radius", &detectionRadius, 0.0f, 250.0f, "%.f"))
       for (const auto& boid : boids) boid->setDetectionRadius(detectionRadius);
-    if (ImGui::Checkbox("Create Boid Controlled By User", &usingUserBoid))
+    if (ImGui::Checkbox("Create Boid Controlled By User", &userBoidActive))
     {
       if (userBoid == nullptr)
         userBoid = createUserBoid();
       else
         destroyUserBoid();
     }
-    if(usingUserBoid && userBoid != nullptr) {
+    if(userBoidActive && userBoid != nullptr) {
       if (ImGui::DragFloat("Movement Speed", &(userBoid->controlledSpeed), 1., 0.0f)) {
         userBoid->setSpeed(userBoid->controlledSpeed);
       }
@@ -251,7 +255,8 @@ void World::drawRulesUI() {
       int i = 0;
       // restore default values
       for (auto& rule : boidsRules) rule->weight = defaultWeights[i++];
-
+      i = 0;
+      for (auto& rule : boidsRules) rule->userBoidBonusWeight = defaultBonusWeights[i++];
       applyFlockingRulesToAllBoids();
     }
 

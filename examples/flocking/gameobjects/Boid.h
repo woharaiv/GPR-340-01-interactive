@@ -24,7 +24,7 @@ public:
   bool controledByUser = false;
   bool drawDebugRadius = true;
   bool drawDebugRules = true;
-  float controlledSpeed = 100.;
+  float controlledSpeed = 200.;
   Color32 circleColor = Color::Purple;
 
   // Constructor

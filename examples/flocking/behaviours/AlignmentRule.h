@@ -6,7 +6,8 @@
 /* Steer toward average heading of local flockmates */
 class AlignmentRule : public FlockingRule {
 public:
-  explicit AlignmentRule(World* pWorld, float weight = 1., bool isEnabled = true) : FlockingRule(pWorld, Color::Yellow, weight, isEnabled) {}
+  explicit AlignmentRule(World* pWorld, float weight = 1., float userBoidBonusWeight = 0., bool isEnabled = true)
+      : FlockingRule(pWorld, Color::Yellow, weight, userBoidBonusWeight, isEnabled, true) {}
 
   std::unique_ptr<FlockingRule> clone() override { return std::make_unique<AlignmentRule>(*this); }
 

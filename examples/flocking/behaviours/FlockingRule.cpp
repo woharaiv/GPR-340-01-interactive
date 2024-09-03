@@ -8,12 +8,12 @@
 #include "engine/Engine.h"
 
 FlockingRule::FlockingRule(const FlockingRule& toCopy)
-    : weight(toCopy.weight), debugColor(toCopy.debugColor), force(toCopy.force), isEnabled(toCopy.isEnabled), world(toCopy.world) {}
+    : weight(toCopy.weight), userBoidBonusWeight(toCopy.userBoidBonusWeight), debugColor(toCopy.debugColor), force(toCopy.force), isEnabled(toCopy.isEnabled), world(toCopy.world) {}
 
 Vector2f FlockingRule::computeWeightedForce(const std::vector<Boid*>& neighborhood, Boid* boid) {
   // the computed force is cached in a var
   if (isEnabled) {
-    force = getBaseWeightMultiplier() * weight * computeForce(neighborhood, boid);
+    force = getBaseWeightMultiplier() * computeForce(neighborhood, boid);
   } else {
     // If the rule is not enabled, return vector zero.
     force = Vector2f::zero();
@@ -41,6 +41,16 @@ bool FlockingRule::drawImguiRule() {
 
       ImGui::SameLine();
       HelpMarker("Drag to change the weight's value or CTRL+Click to input a new value.");
+
+      if(dependsOnOtherBoids && world->userBoidActive)
+      {
+        if (ImGui::DragFloat("User Bonus##", &userBoidBonusWeight, 0.025f)) {
+          valueHasChanged = true;
+        }
+
+        ImGui::SameLine();
+        HelpMarker("In addition to the base weight, the rule will apply a force with this much weight looking at only the user-controlled boid.");
+      }
 
       // Additional settings rule-dependant
       if (drawImguiRuleExtra()) {

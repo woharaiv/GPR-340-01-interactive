@@ -8,7 +8,8 @@ class Boid;
 /* Steer to move toward center of mass of local flockmates */
 class CohesionRule : public FlockingRule {
 public:
-  explicit CohesionRule(World* pWorld, float weight = 1., bool isEnabled = true) : FlockingRule(pWorld, Color::Cyan, weight, isEnabled) {}
+  explicit CohesionRule(World* pWorld, float weight = 1., float userBoidBonusWeight = 0., bool isEnabled = true)
+      : FlockingRule(pWorld, Color::Cyan, weight, userBoidBonusWeight, isEnabled, true) {}
 
   std::unique_ptr<FlockingRule> clone() override {
     // Créer un pointeur concret en utilisant le constructeur abstrait parent

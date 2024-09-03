@@ -8,13 +8,27 @@ Vector2f CohesionRule::computeForce(const std::vector<Boid*>& neighborhood, Boid
   Vector2f cohesionForce = Vector2f::zero();
   Vector2f centerOfMass = Vector2f::zero();
 
-  for (int i = 0; i < neighborhood.size(); i++)
+  Vector2f userBoidPosition = Vector2f::zero();
+  bool userBoidInNeighborhood = false;
+
+  for (auto boid_i : neighborhood)
   {
-    centerOfMass += neighborhood[i]->getPosition();
+    centerOfMass += boid_i->getPosition();
+    if(boid_i->controledByUser)
+    {
+      userBoidInNeighborhood = true;
+      userBoidPosition += boid_i->getPosition();
+    }
   }
   // find center of mass
   centerOfMass /= neighborhood.size();
   //The strength of the cohesion vector is inversely proportional to the radius, and then scaled by k.
-  cohesionForce = (centerOfMass - boid->getPosition()) * (weight/boid->getDetectionRadius());
+  //Weight was originally re-multiplied in FlockingRule::computeWeightedForce()
+  //Since now it's possible to have influence when weight is 0, that step was moved here.
+  cohesionForce = (centerOfMass - boid->getPosition()) * (weight * weight/boid->getDetectionRadius());
+
+  if(userBoidInNeighborhood)
+    cohesionForce += (userBoidPosition - boid->getPosition()) * (userBoidBonusWeight * userBoidBonusWeight/boid->getDetectionRadius());
+
   return cohesionForce;
 }

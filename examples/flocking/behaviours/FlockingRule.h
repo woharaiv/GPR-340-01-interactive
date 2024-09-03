@@ -22,8 +22,9 @@ protected:
   // if displayed
   Color32 debugColor;
 
-  explicit FlockingRule(World* pWorld, Color32 debugColor_, float weight_, bool isEnabled_ = true)
-      : debugColor(debugColor_), force(Vector2f()), weight(weight_), isEnabled(isEnabled_), world(pWorld) {}
+  explicit FlockingRule(World* pWorld, Color32 debugColor_, float weight_, float userBoidBonusWeight_, bool isEnabled_ = true, bool dependsOnOtherBoids_ = false)
+      : debugColor(debugColor_), force(Vector2f()), weight(weight_), userBoidBonusWeight(userBoidBonusWeight_),
+        isEnabled(isEnabled_), dependsOnOtherBoids(dependsOnOtherBoids_), world(pWorld) {}
 
   virtual Vector2f computeForce(const std::vector<Boid*>& neighborhood, Boid* boid) = 0;
 
@@ -41,6 +42,8 @@ protected:
 
 public:
   float weight;
+  float userBoidBonusWeight; //Optional parameter to increase the influence of the user-controlled boid
+  bool dependsOnOtherBoids;
   bool isEnabled;
 
   // Copy constructor

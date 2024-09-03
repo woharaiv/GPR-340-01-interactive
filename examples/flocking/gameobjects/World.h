@@ -24,7 +24,6 @@ private:
   float detectionRadius = 35;
 
   Boid* userBoid = nullptr;
-  bool usingUserBoid = false;
   float userSpeed = 1.0f;
 
   // Display
@@ -36,6 +35,8 @@ private:
   std::vector<std::unique_ptr<FlockingRule>> boidsRules;
   // todo: make this a vector
   std::vector<float> defaultWeights;  // array of default rules weight
+
+  std::vector<float> defaultBonusWeights;  // defaultWeights, but for the user boid bonus weights
 
   /// METHODS
   void initializeRules();
@@ -54,6 +55,8 @@ private:
 public:
   // cached list to manipulate objects
   std::vector<Boid*> boids;
+
+  bool userBoidActive = false;
 
   /// METHODS
   explicit World(Engine* pEngine);

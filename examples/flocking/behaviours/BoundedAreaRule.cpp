@@ -37,7 +37,9 @@ Vector2f BoundedAreaRule::computeForce(const std::vector<Boid*>& neighborhood, B
     force.x += desiredDistance / distToTopLeft.x;
   }
 
-  force *= weight;
+  //Weight was originally re-multiplied in FlockingRule::computeWeightedForce()
+  //Since now it's possible to have influence when weight is 0, that step was moved here.
+  force *= weight * weight;
 
   return force;
 }

@@ -30,22 +30,14 @@ void Boid::Update(float deltaTime) {
   std::vector<Boid*> neighborhood = computeBoidNeighborhood();
   if(!controledByUser)
   {
-    if(!neighborhood.empty())
-    {
-      for (auto& rule : rules) {
+    for (auto& rule : rules) {
+      if(!neighborhood.empty() || !rule->dependsOnOtherBoids) {
         auto weightedForce = rule->computeWeightedForce(neighborhood, this);
         // std::cout << typeid(*rule).name() << " Force : " << Vector2f::getMagnitude(weightedForce) << std::endl;
         applyForce(weightedForce);
       }
     }
-    else //If the neighborhood is empty,
-    {
-      for(int i = 3; i < rules.size(); i++)
-      {
-        auto weightedForce = rules[i]->computeWeightedForce(neighborhood, this);
-        applyForce(weightedForce);
-      }
-    }
+
   }
   else
   {

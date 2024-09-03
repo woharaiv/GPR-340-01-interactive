@@ -6,13 +6,19 @@ Vector2f AlignmentRule::computeForce(const std::vector<Boid*>& neighborhood, Boi
   if(neighborhood.size() <= 0)
     return Vector2f::zero();
 
+  Vector2f userBoidVelocity = Vector2f::zero();
   Vector2f averageVelocity = Vector2f::zero();
 
-  for (int i = 0; i < neighborhood.size(); i++)
+  for (auto boid_i : neighborhood)
   {
-    averageVelocity += neighborhood[i]->getVelocity();
+    averageVelocity += boid_i->getVelocity();
+    if (boid_i->controledByUser)
+      userBoidVelocity += boid_i->getVelocity();
   }
 
+  userBoidVelocity /= neighborhood.size();
   averageVelocity /= neighborhood.size();
-  return Vector2f::normalized(averageVelocity) * weight;
+  //Weight was originally re-multiplied in FlockingRule::computeWeightedForce()
+  //Since now it's possible to have influence when weight is 0, that step was moved here.
+  return Vector2f::normalized(averageVelocity) * weight * weight + Vector2f::normalized(userBoidVelocity) * userBoidBonusWeight * userBoidBonusWeight;
 }

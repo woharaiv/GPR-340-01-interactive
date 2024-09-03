@@ -6,7 +6,9 @@
 
 Vector2f WindRule::computeForce(const std::vector<Boid*>& neighborhood, Boid* boid) {
   Vector2f windForce(cos(windAngle), sin(windAngle));
-  windForce *= weight;
+  //Weight was originally re-multiplied in FlockingRule::computeWeightedForce()
+  //Since now it's possible to have influence on some rules when weight is 0, that step was moved here.
+  windForce *= weight * weight;
   return windForce;
 }
 
