@@ -25,10 +25,10 @@ Vector2f SeparationRule::computeForce(const std::vector<Boid*>& neighborhood, Bo
     if(distToBoid < desiredMinimalDistance)
     {
       // Add the boid's position to the separation vector, scaled by how close that boid is to the target.
-      separatingForce += vecToBoid.normalized()/distToBoid;
+      separatingForce += vecToBoid.normalized()/(distToBoid/desiredMinimalDistance);
       boidsInRadius++;
       if(boid_i->controledByUser)
-        userBoidSeparatingForce = vecToBoid.normalized()/distToBoid;
+        userBoidSeparatingForce = vecToBoid.normalized()/(distToBoid/desiredMinimalDistance);
     }
   }
 
