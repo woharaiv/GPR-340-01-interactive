@@ -173,7 +173,7 @@ void World::Clear() {
 void World::step() {
   auto start = std::chrono::high_resolution_clock::now();
   if (!generators[generatorId]->Step(this)) {
-    isSimulating = false;
+    //isSimulating = false;
   }
   auto stop = std::chrono::high_resolution_clock::now();
   moveDuration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start).count();
