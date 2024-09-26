@@ -8,35 +8,22 @@ bool RecursiveBacktrackerExample::Step(World* w) {
   //While the stack is not empty:
     if(!stack.empty()) {
       Point2D p = stack.back();
-      if(visited[p.y][p.x]) {
+      std::cout << visited[p.y][p.x] <<std::endl;
+      if(visited[p.y][p.x] || w->GetNodeColor(p) == Color::DarkRed || w->GetNodeColor(p) == Color::Black) {
         w->SetNodeColor(p, Color::Black);
+        printf("\n\nthis tile has been visited");
         stack.pop_back();
       }
+      else {
+        printf("\n\nthis tile has not been visited");
+        w->SetNodeColor(p, Color::DarkRed);
+      }
       //Mark the top cell as visited;
-      w->SetNodeColor(p, Color::DarkRed);
       visited[p.y][p.x] = true;
       //List visitable neighbors;
       getVisitables(w, p);
 
-      /*for (auto p2 : visitables) {
-        //Remove the wall between the cell and the neighbor
-        if((p2.y > 0 && p2.y > p.y) || (p2.y < 0 && p2.y < p.y)) {
-          w->SetNorth(p,false);
-          printf("\np2.y (%d) is farther north than p.y (%d)\n", p2.y, p.y);
-        }
-        if((p2.x > 0 && p2.x > p.x) || (p2.x < 0 && p2.x < p.x)) {
-          w->SetEast(p,false);
-          printf("\np2.x (%d) is farther east than p.x (%d)\n", p2.x, p.x);
-        }
-        if((p2.y > 0 && p2.y < p.y) || (p2.y < 0 && p2.y > p.y)) {
-          w->SetSouth(p,false);
-          printf("\np2.y (%d) is farther south than p.y (%d)\n", p2.y, p.y);
-        }
-        if((p2.x > 0 && p2.x < p.x) || (p2.x < 0 && p2.x > p.x)) {
-          w->SetWest(p,false);
-          printf("\np2.x (%d) is farther west than p.x (%d)\n", p2.x, p.x);
-        }
-      }*/
+
       switch(visitables.size()) {
         //If there are no visitables, backtrack
         case 0:
@@ -49,7 +36,25 @@ bool RecursiveBacktrackerExample::Step(World* w) {
           stack.push_back(visitables.at(w->Random() % visitables.size()));
           break;
       }
+      auto p2 = stack.back();
       printf("\nVisiting (%d, %d) next.", stack.back().x, stack.back().y);
+      //Remove the wall between the cell and the neighbor
+        if((p2.y > 0 && p2.y > p.y) || (p2.y <= 0 && p2.y > p.y)) {
+          w->SetSouth(p,false);
+          printf("\np2.y (%d) is farther south than p.y (%d)\n", p2.y, p.y);
+        }
+        else if((p2.x >= 0 && p2.x < p.x) || (p2.x <= 0 && p2.x < p.x)) {
+          w->SetWest(p,false);
+          printf("\np2.x (%d) is farther west than p.x (%d)\n", p2.x, p.x);
+        }
+        else if((p2.y >= 0 && p2.y < p.y) || (p2.y <= 0 && p2.y < p.y)) {
+          w->SetNorth(p,false);
+          printf("\np2.y (%d) is farther north than p.y (%d)\n", p2.y, p.y);
+        }
+        else if((p2.x >= 0 && p2.x > p.x) || (p2.x <= 0 && p2.x > p.x)) {
+          w->SetEast(p,false);
+          printf("\np2.x (%d) is farther east than p.x (%d)\n", p2.x, p.x);
+        }
     }
   return false;
 }
@@ -82,33 +87,29 @@ std::vector<Point2D> RecursiveBacktrackerExample::getVisitables(World* w, const 
   visitables.clear();
   printf("\np is (%d, %d)", p.x, p.y);
   //Up
-  printf("\nAbove point is (%d, %d). ", p.x, p.y + (p.y >= 0 ? 1 : -1));
-  if(!visited[p.y + (p.y >= 0 ? 1 : -1)][p.x] && p.y > w->GetSize()/-2) {
-    visitables.push_back({p.x, p.y-1});
-    w->SetNorth(p,false);
-    printf("Adding above point (%d, %d) to visitables", p.x, p.y + (p.y >= 0 ? 1 : -1));
+  printf("\nAbove point is (%d, %d). ", p.x, p.y - 1);
+  if(!visited[p.y - 1][p.x] && p.y > w->GetSize()/-2) {
+    visitables.push_back({p.x, p.y - 1});
+    printf("Adding above point (%d, %d) to visitables", p.x, p.y - 1);
   }
   //Right
-  printf("\nRight point is (%d, %d). ", p.x + (p.x >= 0 ? 1 : -1), p.y);
-  if(!visited[p.y][p.x + (p.x >= 0 ? 1 : -1)] && p.x < w->GetSize()/2) {
+  printf("\nRight point is (%d, %d). ", p.x + 1, p.y);
+  if(!visited[p.y][p.x + 1] && p.x < w->GetSize()/2) {
     visitables.push_back({p.x + 1, p.y});
-    w->SetEast(p,false);
     printf("Adding right point (%d, %d) to visitables", p.x + (p.x >= 0 ? 1 : -1), p.y);
   }
   //Down
-  printf("\nBelow point is (%d, %d). ", p.x, p.y + (p.y >= 0 ? -1 : 1));
-  if(!visited[p.y + (p.y >= 0 ? -1 : 1)][p.x] && p.y < w->GetSize()/2) {
+  printf("\nBelow point is (%d, %d). ", p.x, p.y + 1);
+  if(!visited[p.y + 1][p.x] && p.y < w->GetSize()/2) {
     printf("\n%d < %d", p.y, w->GetSize()/2);
     visitables.push_back({p.x, p.y + 1});
-    w->SetSouth(p,false);
-    printf("Adding below point (%d, %d) to visitables", p.x, p.y + (p.y >= 0 ? -1 : 1));
+    printf("Adding below point (%d, %d) to visitables", p.x, p.y + 1);
   }
   //Left
-  printf("\nLeft point is (%d, %d). ", p.x + (p.x >= 0 ? -1 : 1), p.y);
-  if(!visited[p.y][p.x + (p.x >= 0 ? -1 : 1)] && p.y > w->GetSize()/-2) {
+  printf("\nLeft point is (%d, %d). ", p.x - 1, p.y);
+  if(!visited[p.y][p.x - 1] && p.x > (int)(w->GetSize()/2)*-1) {
     visitables.push_back({p.x - 1, p.y});
-    w->SetWest(p,false);
-    printf("Adding left point (%d, %d) to visitables", p.x + (p.x >= 0 ? -1 : 1), p.y);
+    printf("Adding left point (%d, %d) to visitables", p.x - 1, p.y);
   }
   return visitables;
 }
