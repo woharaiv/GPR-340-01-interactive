@@ -13,6 +13,9 @@ private:
   Point2D randomStartPoint(World* world);
   std::vector<Point2D> getVisitables(World* w, const Point2D& p);
   std::vector<Point2D> visitables;
+  Point2D p;
+  Color32 nodePrevColor;
+  Point2D startPoint;
 public:
   RecursiveBacktrackerExample() = default;
   std::string GetName() override { return "Recursive Back-Tracker"; };

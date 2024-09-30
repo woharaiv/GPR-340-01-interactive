@@ -7,16 +7,20 @@ bool RecursiveBacktrackerExample::Step(World* w) {
   //If stack is empty, start at top left
   //While the stack is not empty:
     if(!stack.empty()) {
-      Point2D p = stack.back();
+
+      w->SetNodeColor(p, nodePrevColor);
+      p = stack.back();
+      w->SetNodeColor(p, Color::Gainsboro);
+
       std::cout << visited[p.y][p.x] <<std::endl;
       if(visited[p.y][p.x] || w->GetNodeColor(p) == Color::DarkRed || w->GetNodeColor(p) == Color::Black) {
-        w->SetNodeColor(p, Color::Black);
+        nodePrevColor = Color::Black;
         printf("\n\nthis tile has been visited");
         stack.pop_back();
       }
       else {
         printf("\n\nthis tile has not been visited");
-        w->SetNodeColor(p, Color::DarkRed);
+        nodePrevColor = Color::DarkRed;
       }
       //Mark the top cell as visited;
       visited[p.y][p.x] = true;
@@ -27,6 +31,8 @@ bool RecursiveBacktrackerExample::Step(World* w) {
       switch(visitables.size()) {
         //If there are no visitables, backtrack
         case 0:
+          if(p.x == startPoint.x && p.y == startPoint.y)
+            w->SetNodeColor(p, Color::Black);
           return false;
         //If there's only one direction, add that one to the stack, otherwise choose a direction at random
         case 1:
@@ -63,7 +69,9 @@ void RecursiveBacktrackerExample::Clear(World* world) {
   visited.clear();
   stack.clear();
   visitables.clear();
-  stack.push_back({0,0});
+  stack.push_back(randomStartPoint(world));
+  nodePrevColor = Color::DarkGray;
+
   auto sideOver2 = world->GetSize() / 2;
 
   for (int i = -sideOver2; i <= sideOver2; i++) {
@@ -76,6 +84,11 @@ void RecursiveBacktrackerExample::Clear(World* world) {
 Point2D RecursiveBacktrackerExample::randomStartPoint(World* world) {
   auto sideOver2 = world->GetSize() / 2;
 
+  Point2D randomPoint;
+  randomPoint.x = (world->Random() % world->GetSize()) - sideOver2;
+  randomPoint.y = (world->Random() % world->GetSize()) - sideOver2;
+  startPoint = randomPoint;
+  return randomPoint;
   // todo: change this if you want
   for (int y = -sideOver2; y <= sideOver2; y++)
     for (int x = -sideOver2; x <= sideOver2; x++)
