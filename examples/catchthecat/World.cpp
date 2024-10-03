@@ -217,6 +217,10 @@ void World::step() {
 
 int World::getWorldSideSize() { return sideSize; }
 
+std::vector<Point2D> getVisitableNeighbors(Point2D point) {
+
+}
+
 bool World::catWinVerification() {
   auto sideOver2 = sideSize / 2;
   return abs(catPosition.x) == sideOver2 || abs(catPosition.y) == sideOver2;

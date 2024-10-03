@@ -3,6 +3,15 @@
 #include <stdexcept>
 
 Point2D Cat::Move(World* world) {
+  generatePath(world);
+  if(bestPath.size() > 0) {
+    std::cout << "Best path:" << std::endl;
+    for(Point2D point : bestPath) {
+      std::cout << " (" << point.x << ", " << point.y << ")" << std::endl;
+    }
+    return bestPath.at(bestPath.size() - 2);
+  }
+
   auto rand = Random::Range(0, 5);
   auto pos = world->getCat();
   switch (rand) {
