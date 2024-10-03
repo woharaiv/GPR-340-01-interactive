@@ -35,20 +35,21 @@ std::vector<Point2D> Agent::generatePath(World* w) {
     allNeighbors = w->neighbors(current);
     visitable.clear();
     for(Point2D neighbor : allNeighbors) {
+      std::cout << "  (" << neighbor.x << ", " << neighbor.y << ")" << std::endl;
       if(visited.contains(neighbor)) {
-        std::cout << "Not visitable if it's already visited" << std::endl;
+        std::cout << "Not visitable; it's already visited" << std::endl;
         continue;
       }
       if(w->getCat().x == neighbor.x && w->getCat().y == neighbor.y) {
-        std::cout << "Not visitable if the cat is there" << std::endl;
+        std::cout << "Not visitable; the cat is there" << std::endl;
         continue;
       }
-      if(w->getContent(current) == true) {
-        std::cout << "Not visitable if blocked" << std::endl;
+      if(w->getContent(neighbor) == true) {
+        std::cout << "Not visitable; blocked" << std::endl;
         continue;
       }
       if(frontierSet.contains(neighbor)) {
-        std::cout << "Not visitable if in queue" << std::endl;
+        std::cout << "Not visitable; in queue" << std::endl;
         continue;
       }
       visitable.push_back(neighbor);

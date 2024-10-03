@@ -9,6 +9,7 @@ Point2D Cat::Move(World* world) {
     for(Point2D point : bestPath) {
       std::cout << " (" << point.x << ", " << point.y << ")" << std::endl;
     }
+    std::cout << "Moving to (" << bestPath.at(bestPath.size() - 2).x << ", " << bestPath.at(bestPath.size() - 2).y << ")" << std::endl;
     return bestPath.at(bestPath.size() - 2);
   }
 
