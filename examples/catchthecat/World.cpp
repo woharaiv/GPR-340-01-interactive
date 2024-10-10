@@ -41,7 +41,7 @@ void World::clearWorld() {
   worldState.clear();
   worldState.resize(sideSize * sideSize);
   for (auto&& i : worldState) i = false;
-  for (int i = 0; i < sideSize * sideSize * 0.05; i++) worldState[Random::Range(0, (int)worldState.size() - 1)] = true;
+  for (int i = 0; i < sideSize * sideSize * obstacleDensity; i++) worldState[Random::Range(0, (int)worldState.size() - 1)] = true;
   catPosition = {0, 0};
   worldState[(int)worldState.size() / 2] = false;  // clear cat
   isSimulating = false;
@@ -160,6 +160,11 @@ void World::OnGui(ImGuiContext* context) {
     sideSize = (newSize / 2) * 2 + 1;
     clearWorld();
   }
+  if(ImGui::SliderFloat("Obstacle Density", &obstacleDensity, 0.001, 0.999) && sideSize != (newSize / 2) * 2 + 1) {
+    sideSize = (newSize / 2) * 2 + 1;
+    clearWorld();
+  }
+
   if (catTurn)
     ImGui::Text("Turn: CAT");
   else
@@ -228,12 +233,12 @@ void World::step() {
       catcherWon = true;  // cat made a bad move
     }
   } else {
-    this->print();
+    //this->print();
     auto move = catcher->Move(this);
     if (catcherCanMoveToPosition(move)) {
       worldState[(move.y + sideSize / 2) * (sideSize) + move.x + sideSize / 2] = true;
       catcherWon = catcherWinVerification();
-      this->print();
+      //this->print();
     } else {
       isSimulating = false;
       catWon = true;  // catcher made a bad move
@@ -247,8 +252,24 @@ void World::step() {
 
 int World::getWorldSideSize() { return sideSize; }
 
-std::vector<Point2D> getVisitableNeighbors(Point2D point) {
+int World::distToBorder(Point2D p) {
+  //No matter what position a point is, the closest edge can be found by dividing the board into 4 right triangles that meet at the center
+  p.y *= -1;
+  //right region
+  if(p.x - p.y > 0 && p.x + p.y > 0)
+    return (sideSize/2 - p.x);
 
+  //left region
+  if(p.x - p.y > 0 && p.x + p.y > 0)
+    return (sideSize/2 + p.x);
+
+  //top region
+  if(p.x - p.y < 0 && p.x + p.y > 0)
+    return (sideSize/2 - p.y);
+
+  //bottom region; or point 0,0
+  else
+    return (sideSize/2 - p.y);
 }
 
 bool World::catWinVerification() {

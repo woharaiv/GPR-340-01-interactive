@@ -13,10 +13,11 @@ public:
 
   struct PointWithCost {
     Point2D point;
-    int cost = 0;
+    int accumulatedDist = 0;
+    int heuristicDist = 0;
     bool operator<(const PointWithCost& rhs) const {
-      //Returns the opposite direction because the default order of the priority queue is the opposite of the order we want to
-      return cost > rhs.cost;
+      //Returns the opposite direction because the default order of the priority queue puts the highest value first, but we want the lowest value first
+      return accumulatedDist + heuristicDist > rhs.accumulatedDist + rhs.heuristicDist;
     }
   };
 
