@@ -2,6 +2,7 @@
 #include "../Random.h"
 #include <stdexcept>
 #include <algorithm>
+#include <cmath>
 
 Color32::Color32(uint32_t packed) {
   this->a = packed >> 24;
@@ -22,6 +23,34 @@ Color32& Color32::operator=(const Colorf& rhs) {
   r = (uint8_t)(rhs.r * 255);
   g = (uint8_t)(rhs.g * 255);
   b = (uint8_t)(rhs.b * 255);
+  return *this;
+}
+Color32& Color32::operator+=(const Color32& rhs) {
+  a = std::min(a + rhs.a, 255);
+  r = std::min(r + rhs.r, 255);
+  g = std::min(g + rhs.g, 255);
+  b = std::min(b + rhs.b, 255);
+  return *this;
+}
+Color32& Color32::operator-=(const Color32& rhs) {
+  a = std::max(a - rhs.a, 0);
+  r = std::max(r - rhs.r, 0);
+  g = std::max(g - rhs.g, 0);
+  b = std::max(b - rhs.b, 0);
+  return *this;
+}
+Color32& Color32::operator*=(const float& rhs) {
+  a = std::min(a * rhs, 255.0f);
+  r = std::min(r * rhs, 255.0f);
+  g = std::min(g * rhs, 255.0f);
+  b = std::min(b * rhs, 255.0f);
+  return *this;
+}
+Color32& Color32::operator/=(const float& rhs) {
+  a = std::min(a / rhs, 255.0f);
+  r = std::min(r / rhs, 255.0f);
+  g = std::min(g / rhs, 255.0f);
+  b = std::min(b / rhs, 255.0f);
   return *this;
 }
 
@@ -55,6 +84,13 @@ Color32::Color32() {
 }
 
 uint32_t Color32::GetPacked() { return a << 24 | b << 16 | g << 8 | r; }
+Color32 Color32::operator-(const Color32& rhs) const { return Color32(std::max(this->r - rhs.r, 0), std::max(this->g - rhs.g, 0), std::max(this->b - rhs.b, 0), std::max(this->a - rhs.a, 0)); }
+Color32 Color32::operator-(const uint8_t& rhs) const { return Color32(std::max(this->r - rhs, 0), std::max(this->g - rhs, 0), std::max(this->b - rhs, 0), this->a); }
+Color32 Color32::operator+(const Color32& rhs) const { return Color32(std::min(this->r + rhs.r, 255), std::min(this->g + rhs.g, 255), std::min(this->b + rhs.b, 255), std::min(this->a + rhs.a, 255)); }
+Color32 Color32::operator+(const uint8_t& rhs) const { return Color32(std::min(this->r + rhs, 255), std::min(this->g + rhs, 255), std::min(this->b + rhs, 255), this->a); }
+Color32 Color32::operator*(const uint8_t& rhs) const { return Color32(std::min(this->r * rhs, 255), std::min(this->g * rhs, 255), std::min(this->b * rhs, 255), this->a); }
+Color32 Color32::operator*(const float& rhs) const { return  Color32(std::min(this->r * rhs, 255.0f), std::min(this->g * rhs, 255.0f), std::min(this->b * rhs, 255.0f), this->a); }
+Color32 Color32::operator/(const float& rhs) const { return  Color32(std::min(this->r / rhs, 255.0f), std::min(this->g / rhs, 255.0f), std::min(this->b / rhs, 255.0f), this->a); }
 Color32 Color32::LerpColor(Color32 c1, Color32 c2, float a) {
   // todo: use hsv to properly interpolate
   return Color32(std::lerp(c1.r, c2.r, a), std::lerp(c1.g, c2.g, a), std::lerp(c1.b, c2.b, a));

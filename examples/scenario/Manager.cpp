@@ -3,11 +3,12 @@
 #include "generators/ParticleGenerator.h"
 #include "generators/RandomGenerator.h"
 #include "engine/Engine.h"
+#include "generators/WillowsGenerator.h"
 
 #include <chrono>
 
 Manager::Manager(Engine* engine, int size) : GameObject(engine) {
-  // todo: add your generator
+  generators.push_back(new WillowsGenerator());
   generators.push_back(new ParticleGenerator());
   generators.push_back(new RandomScenarioGenerator());
 }
