@@ -8,9 +8,9 @@
 #include <chrono>
 
 Manager::Manager(Engine* engine, int size) : GameObject(engine) {
+  generators.push_back(new RandomScenarioGenerator());
   generators.push_back(new WillowsGenerator());
   generators.push_back(new ParticleGenerator());
-  generators.push_back(new RandomScenarioGenerator());
 }
 
 void Manager::SetPixels(std::vector<Color32>& input) {

@@ -26,17 +26,18 @@ std::vector<Color32> RandomScenarioGenerator::Generate(int sideSize, float displ
       //      float c2 = ((cellular.GetNoise((float)c,(float)l, displacement*50) +1)/2) *255;
 
       auto avg = (c1 + islandInfluence) / 2;
-
+      Color32 pixelColor = Color::Black;
       if (avg < 50)
-        colors.emplace_back(Color::DarkBlue);
+        pixelColor += (Color::DarkBlue + avg);
       else if (avg < 100)
-        colors.emplace_back(Color::Yellow);
+        pixelColor += (Color::Yellow + (avg - 50));
       else if (avg < 150)
-        colors.emplace_back(Color::Green);
+        pixelColor += (Color::DarkRed + (avg - 100));
       else if (avg < 200)
-        colors.emplace_back(Color::Brown);
+        pixelColor += (Color::Brown + (avg - 150));
       else
-        colors.emplace_back(Color::White);
+        pixelColor += (Color::LightPink + (avg - 200));
+      colors.emplace_back(pixelColor);
     }
   }
   std::cout << colors.size() << std::endl;

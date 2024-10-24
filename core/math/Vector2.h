@@ -71,6 +71,8 @@ template <FloatType T> struct Vector2 {
     y *= rhs.y;
     return *this;
   }
+  Vector2<T> operator*(const Vector2& rhs) const { return {x * rhs.x, y * rhs.y}; }
+
   Vector2<T>& operator/=(const Vector2<T>& rhs) {
     x /= rhs.x;
     y /= rhs.y;
