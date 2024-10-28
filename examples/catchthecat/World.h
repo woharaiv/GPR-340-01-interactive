@@ -28,6 +28,8 @@ private:
   // true means blocked
   std::vector<bool> worldState;
 
+  //When the board is generated, a percentage of the tiles chosen at random will be already filled in. More pre-placed tiles means the pathfinding
+  //may have to work harder to find an optimal path
   float obstacleDensity = 0.05;
 
   // size of the side of the map

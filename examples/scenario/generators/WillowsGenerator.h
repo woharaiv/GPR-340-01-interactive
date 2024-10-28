@@ -12,6 +12,7 @@ class WillowsGenerator : public ScenarioGeneratorBase {
 public:
 
   int resolution = 255;
+  int octaves = 10;
 
   unsigned int rngState = 42;
   unsigned int Random();
@@ -26,6 +27,9 @@ public:
 
   float PerlinNoise(float x, float y);
   float PerlinNoise(Vector2d point){return PerlinNoise(point.x, point.y);}
+
+  float FractalBrownianMotion(float x, float y, int octaves);
+
 
   Vector2d GetVec(int v);
   float Lerp(float t, float a1, float a2) {

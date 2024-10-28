@@ -22,16 +22,46 @@ std::vector<Color32> WillowsGenerator::Generate(int sideSize, float displacement
   //std::cout << "init randomArray" << std::endl;
   InitRandomArray();
   std::vector<Color32> colors;
-
+  float minHeight = 999;
+  float maxHeight = 0;
   for (int y = 0; y < sideSize; y++) {
     for (int x = 0; x < sideSize; x++) {
-      //std::cout << "get perlin" << std::endl;
-      colors.emplace_back(Color::Black + PerlinNoise((float)x/resolution, (float)y/resolution) * 255);
+      //Remap from roughly (-1.5, 1.5) to (0, 255)
+      float height = ((FractalBrownianMotion((float)x, (float)y, octaves) + 1.5f) / 3.0f) * 255.0f;
+      if (height<minHeight) minHeight = height;
+      if (height>maxHeight) maxHeight = height;
+      uint8_t pixelColor = (uint8_t)height;
+      //colors.emplace_back(Color32(height, height, height));
+      if(height < 128) //Ocean
+        colors.emplace_back(Color32(0, 0, pixelColor + 32));
+      else if (height < 130) //Shore
+        colors.emplace_back(Color32(pixelColor + 16, pixelColor + 16, 0));
+      else if (height < 160) //Land
+        colors.emplace_back(Color32(0, pixelColor + 32, 0));
+      else //Mountain
+        colors.emplace_back(Color32(pixelColor/2, pixelColor/2, pixelColor/2));
+
     }
   }
+  std::cout << "Minimum Height: " << minHeight << std::endl;
+  std::cout << "Maximum Height: " << maxHeight << std::endl;
   return colors;
 }
 std::string WillowsGenerator::GetName() { return "Willow's Generator"; }
+
+float WillowsGenerator::FractalBrownianMotion(float x, float y, int octaves) {
+  float result = 0;
+  float amplitude = 1;
+  float frequency = 0.005f;
+  for(int oct = 0; oct < octaves; oct++) {
+    float octaveOutput = PerlinNoise(x*frequency, y*frequency) * amplitude;
+    result += octaveOutput;
+
+    amplitude *= 0.5;
+    frequency *= 2;
+  }
+  return result;
+}
 
 float WillowsGenerator::PerlinNoise(float x, float y) {
   int X = (int)x;

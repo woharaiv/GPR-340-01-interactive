@@ -41,7 +41,15 @@ void World::clearWorld() {
   worldState.clear();
   worldState.resize(sideSize * sideSize);
   for (auto&& i : worldState) i = false;
-  for (int i = 0; i < sideSize * sideSize * obstacleDensity; i++) worldState[Random::Range(0, (int)worldState.size() - 1)] = true;
+  for (int i = 0; i < sideSize * sideSize * obstacleDensity; i++) {
+    int randomIndex = Random::Range(0, (int)worldState.size() - 1);
+    if (worldState[randomIndex]) {
+      i--;
+      continue;
+    }
+    else
+      worldState[randomIndex] = true;
+  }
   catPosition = {0, 0};
   worldState[(int)worldState.size() / 2] = false;  // clear cat
   isSimulating = false;
