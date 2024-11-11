@@ -4,7 +4,10 @@
 
 #include "WillowsGenerator.h"
 
+#include "glm/common.hpp"
+
 #include <iostream>
+#include <minwindef.h>
 #include <ostream>
 
 unsigned int WillowsGenerator::Random() {
@@ -26,17 +29,18 @@ std::vector<Color32> WillowsGenerator::Generate(int sideSize, float displacement
   float maxHeight = 0;
   for (int y = 0; y < sideSize; y++) {
     for (int x = 0; x < sideSize; x++) {
+      float height = FractalBrownianMotion((float)x, (float)y, octaves);
       //Remap from roughly (-1.5, 1.5) to (0, 255)
-      float height = ((FractalBrownianMotion((float)x, (float)y, octaves) + 1.5f) / 3.0f) * 255.0f;
-      if (height<minHeight) minHeight = height;
-      if (height>maxHeight) maxHeight = height;
-      uint8_t pixelColor = (uint8_t)height;
+      uint8_t pixelColor = (uint8_t)(((height + 1.5f) / 3.0f) * 255.0f);
+      pixelColor -= glm::clamp((uint8_t)(((((float)sideSize/2 - x)*((float)sideSize/2 - x)/((float)sideSize/2) + ((float)sideSize/2 - y)*((float)sideSize/2 - y)/((float)sideSize/2))/2)),(uint8_t)0,pixelColor);
+      if (pixelColor<minHeight) minHeight = pixelColor;
+      if (pixelColor>maxHeight) maxHeight = pixelColor;
       //colors.emplace_back(Color32(height, height, height));
-      if(height < 128) //Ocean
+      if(pixelColor < 112) //Ocean
         colors.emplace_back(Color32(0, 0, pixelColor + 32));
-      else if (height < 130) //Shore
+      else if (pixelColor < 114) //Shore
         colors.emplace_back(Color32(pixelColor + 16, pixelColor + 16, 0));
-      else if (height < 160) //Land
+      else if (pixelColor < 144) //Land
         colors.emplace_back(Color32(0, pixelColor + 32, 0));
       else //Mountain
         colors.emplace_back(Color32(pixelColor/2, pixelColor/2, pixelColor/2));
